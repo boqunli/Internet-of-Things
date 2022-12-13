@@ -12,12 +12,15 @@
         <el-button type="primary" @click="onSubmit">查询</el-button>
       </el-form-item>
     </el-form>
-    <PieChart />
+    <PieChart v-if="listLoading" :pie-chart-data="pieChartData"/>
   </div>
 </template>
 
 <script>
   import PieChart from './components/PieChart'
+  import {getDayData, getStatistic} from "@/api/sleep";
+  import {format} from "@/utils/util";
+  import {getdiffdate} from "@/utils/util"
 
 export default {
   components: {
@@ -25,6 +28,9 @@ export default {
   },
   data() {
     return {
+      list: null,
+      listLoading: true,
+      pieChartData: [0, 0, 0],
       form: {
         date1: '',
         date2: '',
@@ -34,8 +40,52 @@ export default {
   mounted() {
   },
   methods: {
+
+    fetchData() {
+      this.listLoading = false
+      getStatistic(format(this.form.date1, "yyyy-MM-dd"), format(this.form.date2, "yyyy-MM-dd")).then(response => {
+        this.list = response.data
+        this.listLoading = true
+      })
+    },
+    handleRawData() {
+
+      this.fetchData();
+
+      let counter = new Array()
+      let update = [0,0,0]
+      const dateList = getdiffdate(format(this.form.date1, "yyyy-MM-dd"), format(this.form.date2, "yyyy-MM-dd"))
+      dateList.forEach(ele=>{counter[ele] = 0;})
+      console.log(dateList)
+      // if(this.list !== null) {
+      //   this.list.forEach((ele) => {
+      //     if (parseInt(ele.accelMAX) >= 5000 && parseInt(ele.accelPeriod) > 1) {
+      //       counter[format(ele.messageTime, "yyyy-MM-dd")] = 0;
+      //     }
+      //   })
+      // }
+      if (this.list !== null) {
+        this.list.forEach((ele) => {
+          if (parseInt(ele.accelMAX) >= 5000 && parseInt(ele.accelPeriod) > 1) {
+            counter[format(ele.messageTime, "yyyy-MM-dd")] += 1;
+          }
+        })
+      }
+      for (let k in counter){
+        if (counter[k] <= 5) {
+          update[0]++;
+        } else if (counter[k] >5 && counter[k] <= 10) {
+          update[1]++;
+        } else {
+          update[2]++;
+        }
+      }
+      console.log(counter)
+      this.pieChartData = update;
+    },
     onSubmit() {
-      //TODO
+      this.handleRawData()
+      // console.log(this.list)
       this.$message('submit!')
     },
   }

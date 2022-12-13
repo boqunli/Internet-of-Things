@@ -8,6 +8,12 @@
 
 export default {
   props: {
+    pieChartData: {
+      type: Array,
+      default: function () {
+        return [0, 0, 0]
+      }
+    },
     className: {
       type: String,
       default: 'chart'
@@ -18,7 +24,7 @@ export default {
     },
     height: {
       type: String,
-      default: '350px'
+      default: '600px'
     },
     autoResize: {
       type: Boolean,
@@ -64,15 +70,23 @@ export default {
             name: 'WEEKLY WRITE ARTICLES',
             type: 'pie',
             roseType: 'radius',
-            radius: [15, 95],
-            center: ['50%', '38%'],
+            center: ['50%', '50%'],
             data: [
-              { value: 32, name: '优质睡眠' },
-              { value: 24, name: '一般睡眠' },
-              { value: 14, name: '劣质睡眠' },
+              { value: this.pieChartData[0], name: '优质睡眠' },
+              { value: this.pieChartData[1], name: '一般睡眠' },
+              { value: this.pieChartData[2], name: '劣质睡眠' },
             ],
             animationEasing: 'cubicInOut',
-            animationDuration: 2600
+            animationDuration: 2600,
+            radius: [100, 200],
+            itemStyle: {
+              // emphasis：设置鼠标放到哪一块扇形上面的时候，扇形样式、阴影
+              emphasis: {
+                shadowBlur: 100,
+                shadowOffsetX: 20,
+                shadowColor: "black"
+              },
+            },
           }
         ]
       })

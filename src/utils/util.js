@@ -93,3 +93,59 @@ export function scorePassword (pass) {
 
   return parseInt(score)
 }
+
+export function format(time, format) {   //前台获取时间，转化为国际时间，可以当做工具使用
+  var t = new Date(time);
+  var tf = function(i){return (i < 10 ? '0' : "") + i};
+  return format.replace(/yyyy|MM|dd|HH|mm|ss/g, function(a){
+    switch(a){
+      case 'yyyy':
+        return tf(t.getFullYear());
+        break;
+      case 'MM':
+        return tf(t.getMonth() + 1);
+        break;
+      case 'mm':
+        return tf(t.getMinutes());
+        break;
+      case 'dd':
+        return tf(t.getDate());
+        break;
+      case 'HH':
+        return tf(t.getHours());
+        break;
+      case 'ss':
+        return tf(t.getSeconds());
+        break;
+    }
+  })
+}
+
+
+
+export function getdiffdate(stime,etime){
+  //初始化日期列表，数组
+  var diffdate = new Array();
+  var i=0;
+  //开始日期小于等于结束日期,并循环
+  while(stime<=etime){
+    diffdate[i] = stime;
+
+    //获取开始日期时间戳
+    var stime_ts = new Date(stime).getTime();
+
+    //增加一天时间戳后的日期
+    var next_date = stime_ts + (24*60*60*1000);
+
+    //拼接年月日，这里的月份会返回（0-11），所以要+1
+    var next_dates_y = new Date(next_date).getFullYear()+'-';
+    var next_dates_m = (new Date(next_date).getMonth()+1 < 10)?'0'+(new Date(next_date).getMonth()+1)+'-':(new Date(next_date).getMonth()+1)+'-';
+    var next_dates_d = (new Date(next_date).getDate() < 10)?'0'+new Date(next_date).getDate():new Date(next_date).getDate();
+
+    stime = next_dates_y+next_dates_m+next_dates_d;
+
+    //增加数组key
+    i++;
+  }
+  return diffdate
+}

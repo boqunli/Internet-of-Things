@@ -4,10 +4,30 @@
 
 <script>
   import echarts from 'echarts'
+  import {number} from "echarts/lib/export";
+  import line from "echarts/src/chart/helper/Line";
   require('echarts')
+
+  let timeList = [];
+  let values = [];
+  for (let i = 0; i < 24; i++) {
+    timeList.push("" + i + ":00")
+    values.push(0)
+  }
+
 
 export default {
   props: {
+    lineChartData: {
+      type: Object,
+      default : function () {
+        return  {time: timeList, value:values}
+      }
+    },
+    id: {
+      type: String,
+      default: "0"
+    },
     className: {
       type: String,
       default: 'chart'
@@ -37,14 +57,15 @@ export default {
       }
     }
   },
-  watch: {
-    chartData: {
-      deep: true,
-      handler(val) {
-        this.setOptions(val)
-      }
-    }
-  },
+  // watch: {
+  //   lineChartData: {
+  //     deep: true,
+  //     handler(data) {
+  //       console.log("changed !")
+  //       this.setOptions(data)
+  //     }
+  //   }
+  // },
   mounted() {
     this.initChart();
   },
@@ -57,13 +78,14 @@ export default {
   },
   methods: {
     initChart() {
+      console.log()
       this.chart = echarts.init(this.$el);
       this.setOptions();
     },
     setOptions() {
       this.chart.setOption({
         title: {
-          text: '翻身次数统计'
+          text: this.id === "0"?'翻身次数统计': "翻身次数统计(分钟计数)"
         },
         tooltip: {
           trigger: 'axis',
@@ -77,22 +99,7 @@ export default {
         xAxis: {
           type: 'category',
           boundaryGap: false,
-          data: [
-            '21:00',
-            '22:00',
-            '23:00',
-            '24:00',
-            '1:00',
-            '2:00',
-            '3:00',
-            '4:00',
-            '5:00',
-            '6:00',
-            '7:00',
-            '8:00',
-            '9:00',
-            '10:00',
-          ],
+          data: this.lineChartData.time,
           splitLine: {
             show: true,
             lineStyle: {
@@ -108,7 +115,7 @@ export default {
         yAxis: [
           {
             type: 'value',
-            max: 3,
+            max: this.lineChartData.max,
             splitNumber: 4,
             axisTick: {
               show: false,
@@ -130,7 +137,7 @@ export default {
         },
         series: [{
           smooth: true,
-          data: [0, 0, 0, 1, 0, 2, 0, 0, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0],
+          data: this.lineChartData.value,
           type: 'line',
           areaStyle: {},
           itemStyle: {
